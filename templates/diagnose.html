@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Diagnose | FloraCure{% endblock %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+  <h1 class="text-3xl sm:text-4xl font-extrabold italic bg-gradient-to-r from-emerald-600 via-emerald-700 to-emerald-800 bg-clip-text text-transparent mb-2">
+    Diagnose your plant
+  </h1>
+  <p class="text-slate-600 mb-8">Upload a clear photo and select matching symptoms to get an instant diagnosis.</p>
+
+  <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl p-5 sm:p-8 border border-emerald-100">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% if error %}
+      <div class="bg-red-50 border border-red-200 text-red-700 font-semibold py-3 px-4 rounded-xl mb-6 text-sm">
+        ⚠️ {{ error }}
+      </div>
+      {% endif %}
+
+      <!-- Image Upload -->
+      <label for="plant_image" class="flex flex-col items-center justify-center border-2 border-dashed border-emerald-400 rounded-xl cursor-pointer hover:bg-emerald-50 mb-6 relative overflow-hidden w-full h-56 sm:h-72 transition">
+        <div id="upload-info" class="flex flex-col items-center">
+          <svg class="w-10 h-10 sm:w-12 sm:h-12 text-emerald-500 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v4h16v-4M4 12l8-8 8 8"/>
+          </svg>
+          <span class="text-slate-600 text-sm sm:text-base text-center px-4">
+            Click to upload plant image<br>
+            <span class="text-xs sm:text-sm text-slate-400">JPG, PNG, WEBP up to 5MB</span>
+          </span>
+        </div>
+        <input type="file" id="plant_image" name="plant_image" accept="image/*" class="hidden" onchange="previewImage(event)">
+        <img id="preview" src="" alt="Plant Preview" class="absolute inset-0 w-full h-full object-contain rounded-xl hidden bg-white">
+      </label>
+
+      <!-- Plant Type -->
+      <label class="block mb-2 font-semibold text-emerald-700">Select Plant Type</label>
+      <select name="plant_name" onchange="toggleInput(this.value)"
+              class="w-full border border-emerald-300 rounded-xl p-3 mb-6 focus:ring-2 focus:outline-none focus:ring-emerald-500 bg-white text-slate-800">
+        <option value="">Choose plant...</option>
+        <option value="Tomato">Tomato</option>
+        <option value="Rose">Rose</option>
+        <option value="Potato">Potato</option>
+        <option value="Aloe Vera">Aloe Vera</option>
+        <option value="Mango">Mango</option>
+        <option value="Other">Other (specify below)</option>
+      </select>
+
+      <div id="plant_input_wrap" class="hidden mb-6">
+        <label class="block mb-2 font-semibold text-emerald-700">Plant Name</label>
+        <input type="text" id="plant_input" name="plant_input" placeholder="Enter plant name"
+               class="w-full border border-emerald-300 rounded-xl p-3 focus:ring-2 focus:outline-none focus:ring-emerald-500 bg-white">
+      </div>
+
+      <!-- Symptoms — data comes from views.py context (no custom filter needed) -->
+      <h2 class="text-lg sm:text-xl font-semibold text-emerald-700 mb-4">What symptoms do you see?</h2>
+
+      <div class="space-y-6">
+        {% for group in symptom_groups %}
+        <div>
+          <p class="text-emerald-700 font-bold mb-3 flex items-center gap-2">{{ group.icon }} {{ group.label }}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {% for sym in group.symptoms %}
+            <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-emerald-50 cursor-pointer transition">
+              <input type="checkbox" name="symptoms" value="{{ sym }}" class="accent-emerald-600 w-4 h-4 flex-shrink-0">
+              <span class="text-sm text-slate-700">{{ sym }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Submit -->
+      <div class="text-center mt-10">
+        <button type="submit"
+                class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800
+                       text-white px-10 py-4 rounded-full shadow-lg transition transform hover:scale-105 font-bold text-base sm:text-lg">
+          Analyse Symptoms →
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function previewImage(event) {
+    const preview    = document.getElementById('preview');
+    const uploadInfo = document.getElementById('upload-info');
+    if (event.target.files.length > 0) {
+      preview.src = URL.createObjectURL(event.target.files[0]);
+      preview.classList.remove('hidden');
+      uploadInfo.style.display = 'none';
+    }
+  }
+  function toggleInput(value) {
+    const wrap  = document.getElementById('plant_input_wrap');
+    const input = document.getElementById('plant_input');
+    if (value === 'Other') { wrap.classList.remove('hidden'); input.required = true; }
+    else                   { wrap.classList.add('hidden');    input.required = false; }
+  }
+</script>
+{% endblock %}

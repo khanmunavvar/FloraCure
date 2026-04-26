@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | FloraCure{% endblock %}
+
+{% block content %}
+
+  <!-- Dashboard Header -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 italic mb-1">
+      Dashboard <span class="text-emerald-600">Overview</span>
+    </h1>
+    <p class="text-slate-600 mb-8">Good day, <span class="font-semibold text-emerald-700">{{ user.first_name|default:user.username }}</span> 🌱 — Here's what's happening with your plants today.</p>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
+      <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-5 sm:p-6 hover:shadow-xl transition">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-emerald-600">{{ total_diagnoses }}</h2>
+        <p class="text-slate-600 font-semibold text-sm sm:text-base mt-1">Total Diagnoses</p>
+      </div>
+      <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-5 sm:p-6 hover:shadow-xl transition">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-emerald-600">{{ plants_tracked }}</h2>
+        <p class="text-slate-600 font-semibold text-sm sm:text-base mt-1">Plants Tracked</p>
+      </div>
+      <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-5 sm:p-6 hover:shadow-xl transition">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-emerald-600">{{ active_treatments }}</h2>
+        <p class="text-slate-600 font-semibold text-sm sm:text-base mt-1">Active Treatments</p>
+      </div>
+      <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-5 sm:p-6 hover:shadow-xl transition">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-emerald-600">{{ cured_this_month }}</h2>
+        <p class="text-slate-600 font-semibold text-sm sm:text-base mt-1">Cured This Month</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weather Section -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
+    <div class="relative bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-5 sm:p-6">
+      <div class="absolute -inset-1 bg-emerald-200 blur-3xl opacity-20 rounded-2xl pointer-events-none"></div>
+      <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-emerald-700 mb-1">☁️ Today's Weather</h2>
+          <p class="text-slate-700 font-semibold">
+            <span id="weather-temp" class="text-xl text-slate-900">Detecting...</span>
+            <span class="text-slate-500 mx-1">—</span>
+            <span id="weather-city" class="text-slate-600">please allow location</span>
+          </p>
+          <p class="text-slate-500 text-sm" id="weather-condition"></p>
+        </div>
+        <p class="italic text-emerald-600 text-sm bg-emerald-50 rounded-xl px-4 py-2 border border-emerald-100">
+          🌿 <span id="weather-tip">Loading plant tip...</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Diagnoses -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Recent Diagnoses</h2>
+      <a href="{% url 'hh' %}" class="text-emerald-600 hover:text-emerald-800 font-semibold text-sm">View all →</a>
+    </div>
+
+    <div class="space-y-3 sm:space-y-4">
+      {% for d in recent_diagnoses %}
+      <div class="bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-4 hover:shadow-lg transition flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h3 class="font-bold text-emerald-700">🌱 {{ d.plant_name }}</h3>
+          <p class="text-slate-600 text-sm">{{ d.disease }} — <span class="text-slate-400">{{ d.date|timesince }} ago</span></p>
+        </div>
+        <div class="flex gap-2">
+          <a href="{% url 'diagnosis_detail' d.pk %}" class="text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition">View</a>
+          {% if not d.is_cured %}
+          <a href="{% url 'mark_cured' d.pk %}" class="text-xs font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition">💊 Cure</a>
+          {% else %}
+          <span class="text-xs font-semibold bg-green-100 text-green-700 px-3 py-1.5 rounded-lg">✅ Cured</span>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="bg-white/80 rounded-xl shadow-md p-8 text-center">
+        <p class="text-slate-500 text-lg mb-2">🌿 No diagnoses yet</p>
+        <p class="text-slate-400 text-sm">Start by diagnosing your first plant!</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="{% url 'diagnose' %}"
+         class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-emerald-200 transition hover:-translate-y-1">
+        + New Diagnosis
+      </a>
+    </div>
+  </section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    fetch(`/get-weather/?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById("weather-temp").textContent = "N/A";
+          document.getElementById("weather-city").textContent = data.error;
+          document.getElementById("weather-tip").textContent = "Could not fetch weather.";
+        } else {
+          document.getElementById("weather-temp").textContent = data.temperature + "°C";
+          document.getElementById("weather-city").textContent = data.city;
+          document.getElementById("weather-condition").textContent = data.condition;
+          document.getElementById("weather-tip").textContent = data.tip;
+        }
+      }).catch(() => {
+        document.getElementById("weather-tip").textContent = "Weather unavailable.";
+      });
+  }, function() {
+    document.getElementById("weather-city").textContent = "Location access denied";
+    document.getElementById("weather-temp").textContent = "N/A";
+    document.getElementById("weather-tip").textContent = "Allow location to get weather tips.";
+  });
+}
+</script>
+{% endblock %}

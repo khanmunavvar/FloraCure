@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}History | FloraCure{% endblock %}
+
+{% block content %}
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+    <h1 class="text-3xl sm:text-4xl font-extrabold italic
+               bg-gradient-to-r from-emerald-600 via-emerald-700 to-emerald-800
+               bg-clip-text text-transparent mb-2 drop-shadow-lg">
+      Diagnosis History
+    </h1>
+    <p class="text-slate-600 mb-8">All your past plant diagnoses in one place.</p>
+
+    <div class="space-y-4 sm:space-y-6">
+      {% for d in diagnoses %}
+      <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-4 sm:p-6 hover:shadow-2xl transition">
+
+        <!-- Mobile: stacked, Desktop: row -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+
+          <!-- Image -->
+          {% if d.plant_image %}
+            <img src="{{ d.plant_image.url }}" alt="{{ d.plant_name }}"
+                 class="h-28 w-full sm:h-24 sm:w-24 rounded-xl shadow-md border border-emerald-200 object-cover flex-shrink-0">
+          {% else %}
+            <div class="h-20 w-full sm:h-24 sm:w-24 flex items-center justify-center bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-400 italic text-sm flex-shrink-0">
+              No Image
+            </div>
+          {% endif %}
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <h3 class="text-base sm:text-lg font-bold text-emerald-700 truncate">🌱 {{ d.plant_name }} — {{ d.disease }}</h3>
+            <p class="italic text-slate-500 text-sm truncate">{{ d.symptoms }}</p>
+            <p class="text-xs text-slate-400 mt-1">{{ d.date|date:"d M Y, h:i A" }}</p>
+            <p class="text-emerald-700 font-semibold text-sm mt-1 line-clamp-2">💊 {{ d.cure }}</p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-row sm:flex-col gap-2 sm:gap-2 flex-shrink-0 flex-wrap">
+            <a href="{% url 'diagnosis_detail' d.pk %}"
+               class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg transition text-center">
+              View
+            </a>
+            <a href="{% url 'diagnosis_pdf' d.pk %}"
+               class="text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2 rounded-lg transition text-center">
+              📄 PDF
+            </a>
+            {% if d.is_cured %}
+              <span class="text-xs font-bold bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg text-center">✅ Cured</span>
+            {% else %}
+              <a href="{% url 'mark_cured' d.pk %}"
+                 class="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg shadow transition text-center">
+                💊 Cure
+              </a>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+      {% empty %}
+      <div class="bg-white/80 rounded-2xl shadow-xl p-12 text-center">
+        <p class="text-5xl mb-4">🌿</p>
+        <p class="text-slate-600 italic text-lg mb-2">No diagnosis records found.</p>
+        <a href="{% url 'diagnose' %}" class="inline-block mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl shadow transition">
+          Start Your First Diagnosis
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if diagnoses %}
+    <div class="text-center mt-10">
+      <a href="{% url 'diagnose' %}"
+         class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-emerald-200 transition hover:-translate-y-1">
+        + New Diagnosis
+      </a>
+    </div>
+    {% endif %}
+
+  </section>
+
+{% endblock %}

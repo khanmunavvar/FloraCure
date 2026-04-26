@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile | FloraCure{% endblock %}
+
+{% block content %}
+
+  <section class="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+    <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl p-6 sm:p-8">
+
+      <!-- Avatar -->
+      <div class="text-center mb-8">
+        <div class="h-20 w-20 rounded-full bg-emerald-600 text-white flex items-center justify-center text-3xl font-bold mx-auto shadow-lg">
+          {% if user.first_name %}{{ user.first_name|slice:":1"|upper }}{% else %}{{ user.username|slice:":1"|upper }}{% endif %}
+        </div>
+        <h2 class="text-2xl font-extrabold text-emerald-700 italic mt-3">
+          {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}
+        </h2>
+        <p class="text-slate-500 text-sm">{{ user.email }}</p>
+        <p class="text-slate-400 text-xs mt-1">@{{ user.username }}</p>
+      </div>
+
+      <!-- Success Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 font-semibold py-3 px-4 rounded-xl mb-6 text-sm">
+            ✅ {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Form -->
+      <form method="POST" action="{% url 'profile' %}" class="space-y-5">
+        {% csrf_token %}
+
+        <div>
+          <label class="block text-emerald-700 font-semibold mb-1.5 text-sm">Full Name</label>
+          <input type="text" name="full_name"
+                 value="{{ user.first_name }} {{ user.last_name }}"
+                 class="w-full border border-emerald-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-800">
+        </div>
+
+        <div>
+          <label class="block text-emerald-700 font-semibold mb-1.5 text-sm">Email Address</label>
+          <input type="email" name="email"
+                 value="{{ user.email }}"
+                 class="w-full border border-emerald-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-800">
+        </div>
+
+        <div>
+          <label class="block text-emerald-700 font-semibold mb-1.5 text-sm">City</label>
+          <input type="text" name="city"
+                 value="{{ form.city.value|default_if_none:'' }}"
+                 placeholder="Your city"
+                 class="w-full border border-emerald-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-800">
+        </div>
+
+        <hr class="border-slate-200">
+
+        <div>
+          <label class="block text-emerald-700 font-semibold mb-1.5 text-sm">New Password <span class="text-slate-400 font-normal">(leave blank to keep current)</span></label>
+          <input type="password" name="new_password" placeholder="New password"
+                 class="w-full border border-emerald-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+        </div>
+
+        <div>
+          <label class="block text-emerald-700 font-semibold mb-1.5 text-sm">Confirm New Password</label>
+          <input type="password" name="confirm_password" placeholder="Repeat new password"
+                 class="w-full border border-emerald-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+        </div>
+
+        <button type="submit"
+                class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800
+                       text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:scale-[1.02]">
+          Save Changes
+        </button>
+      </form>
+
+      <!-- Logout -->
+      <div class="mt-6 pt-5 border-t border-slate-200 text-center">
+        <a href="{% url 'logout' %}"
+           class="inline-flex items-center gap-2 text-red-500 hover:text-red-700 font-semibold text-sm transition">
+          🚪 Log out of FloraCure
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+{% endblock %}

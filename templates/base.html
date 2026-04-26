@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FloraCure{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+
+    /* Mobile menu animation */
+    #mobile-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    #mobile-menu.open {
+      max-height: 400px;
+      opacity: 1;
+    }
+
+    /* Hamburger lines animation */
+    .ham-line { transition: all 0.3s ease; transform-origin: center; }
+    .ham-open .line1 { transform: translateY(7px) rotate(45deg); }
+    .ham-open .line2 { opacity: 0; transform: scaleX(0); }
+    .ham-open .line3 { transform: translateY(-7px) rotate(-45deg); }
+
+    {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="h-16 sm:h-20 flex justify-between items-center">
+
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="flex items-center group">
+          <div class="relative">
+            <div class="absolute -inset-1 bg-emerald-400 rounded-full blur opacity-10 group-hover:opacity-40 transition duration-300"></div>
+            <img src="/static/image/fc.png" alt="FloraCure Logo" class="relative h-10 w-10 sm:h-12 sm:w-12">
+          </div>
+          <div class="ml-3 flex flex-col">
+            <span class="text-lg sm:text-xl font-black tracking-tighter text-slate-800 leading-none uppercase">
+              Flora<span class="text-emerald-600">Cure</span>
+            </span>
+            <span class="text-[9px] uppercase tracking-[0.2em] font-bold text-emerald-500">Expert System</span>
+          </div>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center bg-slate-50/80 px-2 py-1.5 rounded-2xl border border-slate-200/50 shadow-inner">
+          <a href="{% url 'home' %}" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-emerald-600 rounded-xl hover:bg-white hover:shadow-sm transition-all duration-200">Home</a>
+          <a href="{% url 'dashboard' %}" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-emerald-600 rounded-xl hover:bg-white hover:shadow-sm transition-all duration-200">Dashboard</a>
+          <a href="{% url 'diagnose' %}" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-emerald-600 rounded-xl hover:bg-white hover:shadow-sm transition-all duration-200">Diagnose</a>
+          <a href="{% url 'hh' %}" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-emerald-600 rounded-xl hover:bg-white hover:shadow-sm transition-all duration-200">History</a>
+        </div>
+
+        <!-- Desktop Profile + Mobile Hamburger -->
+        <div class="flex items-center gap-3">
+          <!-- Profile icon (desktop) -->
+          <a href="{% url 'profile' %}" class="group relative hidden md:block">
+            <div class="absolute -inset-1 bg-emerald-500 rounded-full opacity-0 group-hover:opacity-100 transition duration-300 blur-sm"></div>
+            <div class="relative h-10 w-10 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-sm transition-transform duration-200 group-hover:scale-105">
+              {% if user.first_name %}{{ user.first_name|slice:":1"|upper }}{% else %}{{ user.username|slice:":1"|upper }}{% endif %}
+            </div>
+          </a>
+
+          <!-- Hamburger Button (mobile only) -->
+          <button id="hamburger-btn" onclick="toggleMenu()" aria-label="Toggle menu"
+            class="md:hidden relative w-9 h-9 flex flex-col justify-center items-center gap-[5px] rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition">
+            <span class="ham-line line1 w-5 h-0.5 bg-slate-700 block rounded-full"></span>
+            <span class="ham-line line2 w-5 h-0.5 bg-slate-700 block rounded-full"></span>
+            <span class="ham-line line3 w-5 h-0.5 bg-slate-700 block rounded-full"></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="md:hidden border-t border-slate-100 bg-white/95 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 py-3 space-y-1">
+        <!-- Mobile user greeting -->
+        <div class="flex items-center gap-3 px-3 py-3 mb-2 border-b border-slate-100">
+          <div class="h-9 w-9 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">
+            {% if user.first_name %}{{ user.first_name|slice:":1"|upper }}{% else %}{{ user.username|slice:":1"|upper }}{% endif %}
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-800">{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</p>
+            <p class="text-xs text-slate-500">{{ user.email }}</p>
+          </div>
+        </div>
+
+        <a href="{% url 'home' %}" onclick="closeMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition">
+          <span>🏠</span> Home
+        </a>
+        <a href="{% url 'dashboard' %}" onclick="closeMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition">
+          <span>📊</span> Dashboard
+        </a>
+        <a href="{% url 'diagnose' %}" onclick="closeMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition">
+          <span>🔬</span> Diagnose
+        </a>
+        <a href="{% url 'hh' %}" onclick="closeMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition">
+          <span>📋</span> History
+        </a>
+        <a href="{% url 'profile' %}" onclick="closeMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition">
+          <span>👤</span> Profile
+        </a>
+        <div class="pt-2 border-t border-slate-100 mt-2">
+          <a href="{% url 'logout' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition">
+            <span>🚪</span> Log Out
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <!-- ===== END NAVBAR ===== -->
+
+  <!-- Page Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Flash Messages -->
+  {% if messages %}
+  <div id="flash-messages" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm w-full px-4">
+    {% for message in messages %}
+    <div class="bg-white border border-emerald-200 rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 text-sm font-semibold text-emerald-700 animate-bounce-in">
+      <span>✅</span> {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  <script>setTimeout(() => { const el = document.getElementById('flash-messages'); if(el) el.style.display='none'; }, 4000);</script>
+  {% endif %}
+
+  <!-- Hamburger JS -->
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobile-menu');
+      const btn = document.getElementById('hamburger-btn');
+      const isOpen = menu.classList.toggle('open');
+      btn.classList.toggle('ham-open', isOpen);
+    }
+    function closeMenu() {
+      document.getElementById('mobile-menu').classList.remove('open');
+      document.getElementById('hamburger-btn').classList.remove('ham-open');
+    }
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('mobile-menu');
+      const btn = document.getElementById('hamburger-btn');
+      if (menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+        closeMenu();
+      }
+    });
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
