@@ -1,0 +1,11 @@
+local_settings.py
+db.sqlite3
+floracure_db
+media/
+plant_images/
+__pycache__/
+*.pyc
+venv/
+.vscode/
+.DS_Store
+Thumbs.db
