@@ -3,8 +3,8 @@
   "builds": [
     {
       "src": "FloraCure/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
+      "use": "@vercel/python"
+    
     }
   ],
   "routes": [
@@ -15,3 +15,4 @@
   ]
 }
 
+  // "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }

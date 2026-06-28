@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'change-this-in-local-settings'
 
-DEBUG = True
+DEBUG = False
 WEATHER_API_KEY = ''
 ALLOWED_HOSTS = []
 
@@ -50,8 +50,8 @@ TEMPLATES = [
     },
 ]
 ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
-WSGI_APPLICATION = 'FloraCure.wsgi.application',
-app = 'application'
+WSGI_APPLICATION = ('FloraCure.wsgi.application')
+
 
 DATABASES = {
     'default': {
@@ -75,6 +75,7 @@ USE_TZ = True
 # Static files
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'Static')]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Media files
 MEDIA_URL = '/media/'
