@@ -9,6 +9,7 @@ admin.site.site_title   = "FloraCure Admin Portal"
 admin.site.index_title  = "Welcome to FloraCure Admin"
 
 urlpatterns = [
+    
     path('admin/', admin.site.urls),
     path('', include('floraApp.urls')),
 ]
