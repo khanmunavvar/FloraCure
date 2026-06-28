@@ -49,8 +49,8 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'FloraCure.wsgi.application'
+ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
+WSGI_APPLICATION = 'FloraCure.wsgi.application',app = application
 
 DATABASES = {
     'default': {
